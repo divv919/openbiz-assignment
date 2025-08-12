@@ -3,10 +3,16 @@ import Agreement from "./Agreement";
 import Dropdown from "./Dropdown";
 import Input from "./Input";
 import Button from "./Button";
-import { organisationTypes } from "@/util";
+import { organisationTypes } from "@/app/util";
 import InputDate from "./InputDate";
 
-export default function PanVerificationCard() {
+export default function PanVerificationCard({
+  setCurrentStep,
+  aadhaarValue,
+}: {
+  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+  aadhaarValue: string;
+}) {
   const [isChecked, setIsChecked] = useState(false);
   const [agreementError, setAgreementError] = useState("");
   const [panError, setPanError] = useState("");
@@ -22,54 +28,82 @@ export default function PanVerificationCard() {
   const nameRef = useRef<HTMLInputElement | null>(null);
   const dobRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLSelectElement | null>(null);
+  const handleSubmit = async () => {
+    let hasError = false;
 
-  const handleSubmit = () => {
-    if (dropdownError !== "" && dropdownRef.current) {
-      dropdownRef.current.focus();
-    } else if (panError !== "" && panRef.current) {
-      panRef.current.focus();
-    } else if (nameError !== "" && nameRef.current) {
-      nameRef.current.focus();
-    } else if (DOBError !== "" && dobRef.current) {
-      dobRef.current.focus();
-    }
-    if (!isChecked) {
-      setAgreementError("You must Agree Declerations.");
-    } else {
-      setAgreementError("");
-    }
     if (dropdownValue === organisationTypes[0]) {
       setDropdownError("Required");
+      hasError = true;
     } else {
       setDropdownError("");
     }
+
     if (panValue === "") {
       setPanError("Required");
+      hasError = true;
     } else {
       setPanError("");
     }
+
     if (nameValue === "") {
       setNameError("Required");
+      hasError = true;
     } else {
       setNameError("");
     }
+
     if (!DOBValue) {
       setDOBError("Required");
-      return;
+      hasError = true;
     } else {
       setDOBError("");
     }
-    //logic for pan handling
+
+    if (!isChecked) {
+      setAgreementError("You must Agree Declarations.");
+      hasError = true;
+    } else {
+      setAgreementError("");
+    }
+
+    console.log("has error", hasError);
+    if (hasError) return;
+
+    try {
+      const res = await fetch("/api/pan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          aadhaar: aadhaarValue,
+          panName: nameValue,
+          pan: panValue,
+          type: (dropdownValue.match(/^(\d+)\./)?.[1] ?? "").trim(),
+          dob: DOBValue?.toISOString(),
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      const parsed = await res.json();
+      if (parsed.success) {
+        alert(parsed.message);
+        setCurrentStep(parsed.user.currentStep);
+      }
+    } catch (err) {
+      console.log("Error posting pan details", err);
+    }
   };
 
   return (
-    <article className="shadow-2xl mt-6 mx-4 md:mx-[30px] ">
+    <article className="shadow-2xl mt-6 mx-4 md:mx-[30px] lg:mx-[36px] xl:mx-[160px]">
       <header className="bg-[#28A745] text-[17.6px] py-3 px-5 text-white rounded-t-sm">
         PAN Verification
       </header>
 
       <div className="p-5 flex flex-col items-start gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
           <Dropdown
             ref={dropdownRef}
             isError={dropdownError}

@@ -1,4 +1,4 @@
-import { organisationTypes } from "@/util";
+import { organisationTypes } from "@/app/util";
 
 interface DropdownInput {
   options: string[];
@@ -31,7 +31,7 @@ export default function Dropdown({
         // defaultValue={options[0]}
         // onBlur={handleBlur}
         ref={ref}
-        className="px-3 py-2 border border-neutral-300 rounded-sm focus:outline-4 focus:outline-blue-200"
+        className="px-3 py-2 border border-neutral-300 transition-all duration-100 ease-in-out rounded-sm focus:outline-4 focus:outline-blue-200"
         value={dropdownValue}
         onChange={(e) => setDropdownValue(e.target.value)}
       >

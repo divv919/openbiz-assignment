@@ -37,7 +37,7 @@ export default function InputDate({
     <div className="flex flex-col gap-2">
       <label className="text-black font-[700]">{label}</label>
       <DatePicker
-        className="px-3 py-2 border border-neutral-300 rounded-sm focus:outline-4 focus:outline-blue-200 w-full"
+        className="px-3 py-2 border border-neutral-300 rounded-sm focus:outline-4 focus:outline-blue-200 w-full transition-all duration-300 ease-in-out"
         selected={selected}
         onChange={onChange}
         onBlur={handleBlur}

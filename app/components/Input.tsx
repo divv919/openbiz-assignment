@@ -75,7 +75,7 @@ export default function Input({
         pattern={validationForType[type].pattern}
         value={inputValue}
         onChange={handleChange}
-        className="px-3 py-2 border border-neutral-300 rounded-sm w-full"
+        className="transition-all duration-100 ease-in-out focus:outline-4 focus:outline-blue-200 px-3 py-2 border border-neutral-300 rounded-sm w-full"
       />
       {isError && <p style={{ color: "red" }}>{isError}</p>}
     </div>

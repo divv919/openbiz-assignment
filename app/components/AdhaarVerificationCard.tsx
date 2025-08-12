@@ -1,21 +1,31 @@
-import { useRef, useState } from "react";
+import { SetStateAction, useRef, useState } from "react";
 import Agreement from "./Agreement";
 import Input from "./Input";
 import Button from "./Button";
 
-export default function AdhaarVerificationCard() {
+export default function AadhaarVerificationCard({
+  setCurrentStep,
+  currentStep,
+  setAadhaarValue,
+  aadhaarValue,
+}: {
+  setCurrentStep: React.Dispatch<SetStateAction<number>>;
+  currentStep: number;
+  aadhaarValue: string;
+  setAadhaarValue: React.Dispatch<SetStateAction<string>>;
+}) {
   const [isChecked, setIsChecked] = useState(false);
-  const adhaarRef = useRef<HTMLInputElement | null>(null);
+  const aadhaarRef = useRef<HTMLInputElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
 
-  const [adhaarError, setAdhaarError] = useState("");
+  const [aadhaarError, setAadhaarError] = useState("");
   const [nameError, setNameError] = useState("");
   const [agreementError, setAgreementError] = useState("");
-  const [adhaarValue, setAdhaarValue] = useState("");
   const [nameValue, setNameValue] = useState("");
-  const handleSubmit = () => {
-    if (adhaarError !== "" && adhaarRef.current) {
-      adhaarRef.current.focus();
+  const handleSubmit = async () => {
+    let hasError = false;
+    if (aadhaarError !== "" && aadhaarRef.current) {
+      aadhaarRef.current.focus();
       return;
     }
     if (nameError !== "" && nameRef.current) {
@@ -24,26 +34,52 @@ export default function AdhaarVerificationCard() {
     }
     if (!isChecked) {
       setAgreementError("You must Agree Declerations");
+      hasError = true;
     } else {
       setAgreementError("");
     }
-    if (adhaarValue === "") {
-      setAdhaarError("Required");
+    if (aadhaarValue === "") {
+      setAadhaarError("Required");
+      hasError = true;
     } else {
-      setAdhaarError("");
+      setAadhaarError("");
     }
     if (nameValue === "") {
       setNameError("Required");
-      return;
+      hasError = true;
     } else {
       setNameError("");
     }
-
-    //logic for adhar handling
+    if (hasError) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/aadhaar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          aadhaar: aadhaarValue,
+          aadhaarName: nameValue,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error();
+      }
+      const parsed = await res.json();
+      if (parsed.success) {
+        console.log("data", parsed);
+        alert(parsed.message);
+        setCurrentStep(parsed.user.currentStep);
+      }
+    } catch (err) {
+      console.log("Error sending Aadhaar details : " + err);
+    }
   };
 
   return (
-    <article className="shadow-2xl mt-15 mx-4 md:mx-[30px]">
+    <article className="shadow-2xl mt-15 mx-4 md:mx-[30px] lg:mx-[36px] xl:mx-[160px]">
       <header className="bg-[#007BFF] text-[17.6px] py-3 px-5 text-white rounded-t-sm">
         Aadhaar Verification With OTP
       </header>
@@ -51,13 +87,13 @@ export default function AdhaarVerificationCard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
           <Input
             placeholder="Your Aadhaar No"
-            isError={adhaarError}
-            setIsError={setAdhaarError}
-            ref={adhaarRef}
+            isError={aadhaarError}
+            setIsError={setAadhaarError}
+            ref={aadhaarRef}
             type="ADHAAR"
             label="1. Aadhaar Number/ आधार संख्या"
-            inputValue={adhaarValue}
-            setInputValue={setAdhaarValue}
+            inputValue={aadhaarValue}
+            setInputValue={setAadhaarValue}
           />
           <Input
             placeholder="Name as per Aadhaar"
