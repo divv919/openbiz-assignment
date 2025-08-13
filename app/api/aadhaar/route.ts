@@ -3,16 +3,6 @@ import { AadhaarBodySchema } from "@/app/util";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log("ENV IS ");
-console.log(process.env.DATABASE_URL);
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
