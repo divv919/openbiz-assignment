@@ -22,10 +22,13 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.log("error in pan : ", err);
     if (err instanceof z.ZodError) {
+      const errorMessages = err.issues.map((errorObject) => {
+        return errorObject.message;
+      });
       return NextResponse.json(
         {
           success: false,
-          errors: err.issues,
+          errors: errorMessages,
         },
         { status: 400 }
       );

@@ -1,4 +1,4 @@
-type InputType = "Name" | "PAN" | "ADHAAR";
+type InputType = "Name" | "PAN" | "ADHAAR" | "OTP";
 
 const validationForType: Record<
   InputType,
@@ -16,6 +16,10 @@ const validationForType: Record<
     maxLength: 12,
     pattern: "^[\\w\\W]{1,100}$",
   },
+  OTP: {
+    maxLength: 6,
+    pattern: "^[\\w\\W]{1,100}$",
+  },
 };
 
 export default function Input({
@@ -27,6 +31,7 @@ export default function Input({
   inputValue,
   setInputValue,
   placeholder,
+  disabled,
 }: {
   label: string;
   type: InputType;
@@ -36,10 +41,14 @@ export default function Input({
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   placeholder: string;
+  disabled: boolean;
 }) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (type === "ADHAAR" && isNaN(Number(value))) {
+      return;
+    }
+    if (type === "OTP" && isNaN(Number(value))) {
       return;
     }
     setInputValue(value);
@@ -67,6 +76,7 @@ export default function Input({
     <div className="flex flex-col gap-1">
       <label className="text-black font-[700]">{label}</label>
       <input
+        disabled={disabled}
         placeholder={placeholder}
         onBlur={handleBlur}
         ref={ref}
@@ -75,7 +85,7 @@ export default function Input({
         pattern={validationForType[type].pattern}
         value={inputValue}
         onChange={handleChange}
-        className="transition-all duration-100 ease-in-out focus:outline-4 focus:outline-blue-200 px-3 py-2 border border-neutral-300 rounded-sm w-full"
+        className="transition-all duration-100 ease-in-out focus:outline-4 focus:outline-blue-200 px-3 py-2 border border-neutral-300 rounded-sm w-full disabled:text-neutral-500 disabled:bg-neutral-200"
       />
       {isError && <p style={{ color: "red" }}>{isError}</p>}
     </div>

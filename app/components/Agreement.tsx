@@ -6,18 +6,20 @@ interface AgreementType {
   label: string;
   error: string;
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
+  disabled: boolean;
 }
 export default function Agreement({
   isChecked,
   setIsChecked,
   label,
   error,
+  disabled,
 }: AgreementType) {
   return (
     <div className="text-justify">
       <input
         // id={id}
-
+        disabled={disabled}
         type="checkbox"
         checked={isChecked}
         onChange={(e) => setIsChecked(!!e.target.checked)}

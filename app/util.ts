@@ -19,6 +19,11 @@ const AadhaarSchema = z
   .regex(/^[2-9]{1}[0-9]{11}$/, "Invalid Aadhaar number")
   .length(12, "Aadhaar must be exactly 12 digits");
 
+//    1)There is error in Aadhaar Validation/Authentication.
+// Error Code: Invalid Auth XML format. 510
+// 2) Your Aadhaar has not been validated hence you cannot register Udyam.
+// 3) Please Visit Your Nearest Aadhaar Enrolment Centre.
+
 export const AadhaarBodySchema = z.object({
   aadhaarName: z
     .string()

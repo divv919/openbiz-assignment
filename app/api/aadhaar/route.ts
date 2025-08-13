@@ -31,8 +31,12 @@ export async function POST(req: NextRequest) {
     console.log("error is ", err);
 
     if (err instanceof z.ZodError) {
+      const errorMessages = err.issues.map((errorObject) => {
+        return errorObject.message;
+      });
+      // console.log("errorobj is ", errorObj);
       return NextResponse.json(
-        { success: false, errors: err.issues },
+        { success: false, errors: errorMessages },
         { status: 400 }
       );
     }

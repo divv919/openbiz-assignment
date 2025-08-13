@@ -28,8 +28,23 @@ export default function PanVerificationCard({
   const nameRef = useRef<HTMLInputElement | null>(null);
   const dobRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLSelectElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState<{
+    visible: boolean;
+    status: "error" | "success";
+    message: string[];
+  }>({
+    visible: false,
+    status: "error",
+    message: [],
+  });
   const handleSubmit = async () => {
     let hasError = false;
+    setNotification({
+      message: [],
+      status: "error",
+      visible: false,
+    });
 
     if (dropdownValue === organisationTypes[0]) {
       setDropdownError("Required");
@@ -42,7 +57,7 @@ export default function PanVerificationCard({
       setPanError("Required");
       hasError = true;
     } else {
-      setPanError("");
+      // setPanError("");
     }
 
     if (nameValue === "") {
@@ -70,6 +85,7 @@ export default function PanVerificationCard({
     if (hasError) return;
 
     try {
+      setIsLoading(true);
       const res = await fetch("/api/pan", {
         method: "POST",
         headers: {
@@ -84,15 +100,35 @@ export default function PanVerificationCard({
         }),
       });
 
-      if (!res.ok) throw new Error();
+      if (res.status === 500) throw new Error();
 
       const parsed = await res.json();
+      if (res.status === 400) {
+        setNotification({
+          message: parsed.errors,
+          status: "error",
+          visible: true,
+        });
+        return;
+      }
       if (parsed.success) {
-        alert(parsed.message);
+        // alert(parsed.message);
+        setNotification({
+          message: [parsed.message],
+          status: "success",
+          visible: true,
+        });
         setCurrentStep(parsed.user.currentStep);
       }
     } catch (err) {
       console.log("Error posting pan details", err);
+      setNotification({
+        message: ["Internal Server Error"],
+        status: "error",
+        visible: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,6 +148,7 @@ export default function PanVerificationCard({
             setDropdownValue={setDropdownValue}
             label="3. Type of Organisation / संगठन के प्रकार"
             options={organisationTypes}
+            disabled={false}
           ></Dropdown>
           <Input
             placeholder="ENTER PAN NUMBER"
@@ -122,6 +159,7 @@ export default function PanVerificationCard({
             ref={panRef}
             label="4.1 PAN/ पैन"
             type="PAN"
+            disabled={false}
           />
           <Input
             placeholder="Name as per PAN"
@@ -132,6 +170,7 @@ export default function PanVerificationCard({
             setInputValue={setNameValue}
             label="4.1.1 Name of PAN Holder / पैन धारक का नाम"
             type="Name"
+            disabled={false}
           />
 
           <InputDate
@@ -153,17 +192,35 @@ export default function PanVerificationCard({
               }
               setDOBValue(date);
             }}
+            disabled={false}
           />
         </div>
         <Agreement
           error={agreementError}
           isChecked={isChecked}
           setIsChecked={setIsChecked}
+          disabled={false}
           label="  I, the holder of the above PAN, hereby give my consent to Ministry of MSME, Government of India, for using my data/ information available in the Income Tax Returns filed by me, and also the same available in the GST Returns and also from other Government organizations, for MSME classification and other official purposes, in pursuance of the MSMED Act, 2006."
         />
-        <Button onClick={handleSubmit} text="PAN Validate" />
-        {/* green for success - #008000 red for error #FF0000 */}
-        <div className="min-h-[100px] font-[700]">Notification</div>
+
+        <Button
+          disabled={isLoading}
+          onClick={handleSubmit}
+          text="PAN Validate"
+        />
+        {notification.visible && (
+          <div
+            className={`min-h-[100px] font-[700] ${
+              notification.status === "error"
+                ? "text-red-500"
+                : "text-green-500"
+            }`}
+          >
+            {notification.message.map((msg, idx) => {
+              return <div key={idx}>{idx + 1 + ") " + msg}</div>;
+            })}
+          </div>
+        )}
       </div>
     </article>
   );

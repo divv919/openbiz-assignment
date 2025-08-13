@@ -8,6 +8,7 @@ interface DropdownInput {
   dropdownValue: string;
   setDropdownValue: React.Dispatch<React.SetStateAction<string>>;
   ref: React.Ref<HTMLSelectElement> | undefined;
+  disabled: boolean;
 }
 export default function Dropdown({
   options,
@@ -17,6 +18,7 @@ export default function Dropdown({
   dropdownValue,
   setDropdownValue,
   ref,
+  disabled,
 }: DropdownInput) {
   const handleBlur = (e: React.FocusEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -28,6 +30,7 @@ export default function Dropdown({
     <div className="flex flex-col gap-2">
       <label className="text-black font-[700]">{label}</label>
       <select
+        disabled={disabled}
         // defaultValue={options[0]}
         // onBlur={handleBlur}
         ref={ref}

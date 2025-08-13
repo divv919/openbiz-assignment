@@ -17,11 +17,27 @@ export default function AadhaarVerificationCard({
   const [isChecked, setIsChecked] = useState(false);
   const aadhaarRef = useRef<HTMLInputElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
+  const otpRef = useRef<HTMLInputElement | null>(null);
 
   const [aadhaarError, setAadhaarError] = useState("");
   const [nameError, setNameError] = useState("");
   const [agreementError, setAgreementError] = useState("");
   const [nameValue, setNameValue] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [otpEnabled, setOtpEnabled] = useState(false);
+
+  const [notification, setNotification] = useState<{
+    visible: boolean;
+    status: "error" | "success";
+    message: string[];
+  }>({
+    visible: false,
+    status: "error",
+    message: [],
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+
   const handleSubmit = async () => {
     let hasError = false;
     if (aadhaarError !== "" && aadhaarRef.current) {
@@ -50,10 +66,27 @@ export default function AadhaarVerificationCard({
     } else {
       setNameError("");
     }
+    if (otpEnabled && otpValue === "") {
+      setOtpError("Required");
+      hasError = true;
+    } else {
+      setAadhaarError("");
+    }
+    if (!otpError && otpEnabled && otpValue !== VALID_OTP) {
+      setOtpError("Invalid OTP");
+      hasError = true;
+    }
+    console.log("has error ", hasError);
     if (hasError) {
       return;
     }
+    console.log(otpEnabled);
+    if (!otpEnabled) {
+      setOtpEnabled(true);
+      return;
+    }
     try {
+      setIsLoading(true);
       const res = await fetch("/api/aadhaar", {
         method: "POST",
         headers: {
@@ -64,19 +97,42 @@ export default function AadhaarVerificationCard({
           aadhaarName: nameValue,
         }),
       });
-      if (!res.ok) {
-        throw new Error();
+      if (res.status === 500) {
+        throw new Error("Internal Server Error");
       }
+
       const parsed = await res.json();
+      if (res.status === 400) {
+        setNotification({
+          message: parsed.errors,
+          status: "error",
+          visible: true,
+        });
+        return;
+      }
       if (parsed.success) {
-        console.log("data", parsed);
-        alert(parsed.message);
+        // console.log("data", parsed);
+        setNotification({
+          message: [parsed.message],
+          status: "success",
+          visible: true,
+        });
         setCurrentStep(parsed.user.currentStep);
       }
     } catch (err) {
-      console.log("Error sending Aadhaar details : " + err);
+      console.log("error is ", err);
+
+      setNotification({
+        message: ["Internal Server Error"],
+        status: "error",
+        visible: true,
+      });
+    } finally {
+      setIsLoading(false);
+      setOtpEnabled(false);
     }
   };
+  const VALID_OTP = "123123";
 
   return (
     <article className="shadow-2xl mt-15 mx-4 md:mx-[30px] lg:mx-[36px] xl:mx-[160px]">
@@ -94,6 +150,7 @@ export default function AadhaarVerificationCard({
             label="1. Aadhaar Number/ आधार संख्या"
             inputValue={aadhaarValue}
             setInputValue={setAadhaarValue}
+            disabled={currentStep > 1}
           />
           <Input
             placeholder="Name as per Aadhaar"
@@ -104,6 +161,7 @@ export default function AadhaarVerificationCard({
             label="2. Name of Entrepreneur / उद्यमी का नाम"
             inputValue={nameValue}
             setInputValue={setNameValue}
+            disabled={currentStep > 1}
           />
         </div>
         <ul className="list-disc pl-10">
@@ -127,15 +185,51 @@ export default function AadhaarVerificationCard({
         </ul>
         <Agreement
           // id="Adhaar-Agreement"
+
           isChecked={isChecked}
           setIsChecked={setIsChecked}
           label={
             "  I, the holder of the above Aadhaar, hereby give my consent to Ministry of MSME, Government of India, for using my Aadhaar number as alloted by UIDAI for Udyam Registration. NIC / Ministry of MSME, Government of India, have informed me that my aadhaar data will not be stored/shared. / मैं, आधार धारक, इस प्रकार उद्यम पंजीकरण के लिए यूआईडीएआई के साथ अपने आधार संख्या का उपयोग करने के लिए सू0ल0म0उ0 मंत्रालय, भारत सरकार को अपनी सहमति देता हूं। एनआईसी / सू0ल0म0उ0 मंत्रालय, भारत सरकार ने मुझे सूचित किया है कि मेरा आधार डेटा संग्रहीत / साझा नहीं किया जाएगा।"
           }
           error={agreementError}
+          disabled={currentStep > 1}
         />
-        <Button text="Validate & Generate OTP" onClick={handleSubmit} />
-        <div className="min-h-[100px] font-[700]">Notification</div>
+        {otpEnabled && (
+          <div className="w-full">
+            <Input
+              ref={otpRef}
+              type="OTP"
+              disabled={false}
+              inputValue={otpValue}
+              setInputValue={setOtpValue}
+              isError={otpError}
+              setIsError={setOtpError}
+              label="*Enter One Time Password(OTP) Code"
+              placeholder="OTP code"
+            />
+            <p>OTP has been sent ({VALID_OTP} is the valid OTP for testing)</p>
+          </div>
+        )}
+        {currentStep === 1 && (
+          <Button
+            disabled={isLoading}
+            text="Validate & Generate OTP"
+            onClick={handleSubmit}
+          />
+        )}{" "}
+        {notification.visible && (
+          <div
+            className={`min-h-[100px] font-[700] ${
+              notification.status === "error"
+                ? "text-red-500"
+                : "text-green-500"
+            }`}
+          >
+            {notification.message.map((msg, idx) => {
+              return <div key={idx}>{idx + 1 + ") " + msg}</div>;
+            })}
+          </div>
+        )}
       </div>
     </article>
   );
