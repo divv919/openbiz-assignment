@@ -1,21 +1,29 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient();
-export const checkUser = async (aadhaar: string) => {
-  const res = await prisma.user.findFirst({
-    where: {
-      aadhaar,
-    },
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+export const prisma =
+  global.prisma ||
+  new PrismaClient({
+    log: ["query", "warn", "error"],
   });
-  return res;
+
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+
+export const checkUser = async (aadhaar: string) => {
+  return await prisma.user.findFirst({
+    where: { aadhaar },
+  });
 };
 
 export const postUserStep1 = async (aadhaar: string, aadhaarName: string) => {
-  const res = await prisma.user.create({
+  return await prisma.user.create({
     data: { aadhaar, aadhaarName, currentStep: 2 },
   });
-  return res;
 };
+
 export const postUserStep2 = async (
   aadhaar: string,
   panName: string,
@@ -23,7 +31,7 @@ export const postUserStep2 = async (
   type: number,
   dob: Date
 ) => {
-  const res = await prisma.user.update({
+  return await prisma.user.update({
     where: { aadhaar },
     data: {
       panName,
@@ -33,5 +41,4 @@ export const postUserStep2 = async (
       currentStep: 3,
     },
   });
-  return res;
 };
