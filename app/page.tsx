@@ -4,6 +4,8 @@ import AdhaarVerificationCard from "./components/AdhaarVerificationCard";
 import UpperHeader from "./components/UpperHeader";
 import PanVerificationCard from "./components/PanVerificationCard";
 import SuccessScreen from "./components/SuccessScreen";
+import Marquee from "react-fast-marquee";
+import Link from "next/link";
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -36,6 +38,19 @@ export default function Home() {
           aadhaarValue={aadhaarValue}
         />
       )}
+      <Marquee pauseOnHover={true} className="my-5">
+        <Link
+          target="_blank"
+          href={
+            "https://udyamregistration.gov.in/docs/OM_regarding_inclusion_of_Traders02072021.pdf"
+          }
+        >
+          <p className="font-[700] font-source text-[#007bff] hover:text-[#10539b] cursor-pointer">
+            Activities (NIC codes) not covered under MSMED Act, 2006 for Udyam
+            Registration
+          </p>
+        </Link>
+      </Marquee>
     </div>
   );
 }

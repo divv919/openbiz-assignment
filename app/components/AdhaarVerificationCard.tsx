@@ -2,6 +2,7 @@ import { SetStateAction, useRef, useState } from "react";
 import Agreement from "./Agreement";
 import Input from "./Input";
 import Button from "./Button";
+import Link from "next/link";
 
 export default function AadhaarVerificationCard({
   setCurrentStep,
@@ -176,11 +177,14 @@ export default function AadhaarVerificationCard({
             In case of a Company or a Limited Liability Partnership or a
             Cooperative Society or a Society or a Trust, the organisation or its
             authorised signatory shall provide its GSTIN(As per applicablity of
-            CGST Act 2017 and as notified by the ministry of MSME vide S.O.
-          </li>
-          <li>
-            1055(E) dated 05th March 2021) and PAN along with its Aadhaar
-            number.
+            CGST Act 2017 and as notified by the ministry of MSME
+            <span className="text-[#007bff] hover:text-[#114275] cursor-pointer">
+              <Link href={"https://udyamregistration.gov.in/docs/225669.pdf"}>
+                {" "}
+                vide S.O. 1055(E) dated 05th March 2021
+              </Link>
+            </span>
+            ) and PAN along with its Aadhaar number.
           </li>
         </ul>
         <Agreement
