@@ -1,7 +1,7 @@
 import { checkUser, postUserStep1 } from "@/app/lib/db";
 import { AadhaarBodySchema } from "@/app/util";
 import { NextRequest, NextResponse } from "next/server";
-import z, { success } from "zod";
+import z from "zod";
 
 export async function POST(req: NextRequest) {
   try {
