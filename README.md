@@ -11,6 +11,7 @@ This is a [Next.js](https://nextjs.org) project that clones the Udhyam registrat
 - Form validation using regex patterns and JavaScript
 - Aadhaar and PAN verification APIs
 - OTP verification system (Hardcoded for now)
+- Being stored in Database hence if someone tries to re-register they will be redirected to the step they were previously on
 
 ## Tech Stack
 
