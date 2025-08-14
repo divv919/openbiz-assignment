@@ -18,6 +18,7 @@ This is a [Next.js](https://nextjs.org) project that clones the Udhyam registrat
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Validation**: regex patterns
+- **Database & ORM**: PostgreSQL from Supabase and Prisma ORM
 
 ## Getting Started
 
@@ -51,6 +52,16 @@ This is a [Next.js](https://nextjs.org) project that clones the Udhyam registrat
 
    - Copy the `.env.example` file to `.env`
    - Update the environment variables as needed
+   - Make sure you have a Supabase PostgreSQL database.
+   - Update the `DATABASE_URL` in `.env` with your Supabase connection string.
+   - Run the following command to apply Prisma migrations:
+     ```bash
+     npx prisma migrate dev
+     ```
+   - To view or manage data visually:
+     ```bash
+     npx prisma studio
+     ```
 
 4. Run the development server:
 
