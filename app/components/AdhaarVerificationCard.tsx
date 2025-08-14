@@ -9,11 +9,15 @@ export default function AadhaarVerificationCard({
   currentStep,
   setAadhaarValue,
   aadhaarValue,
+  isLoading,
+  setIsLoading,
 }: {
   setCurrentStep: React.Dispatch<SetStateAction<number>>;
   currentStep: number;
   aadhaarValue: string;
   setAadhaarValue: React.Dispatch<SetStateAction<string>>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<SetStateAction<boolean>>;
 }) {
   const [isChecked, setIsChecked] = useState(false);
   const aadhaarRef = useRef<HTMLInputElement | null>(null);
@@ -36,7 +40,6 @@ export default function AadhaarVerificationCard({
     status: "error",
     message: [],
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [otpValue, setOtpValue] = useState("");
 
   const handleSubmit = async () => {

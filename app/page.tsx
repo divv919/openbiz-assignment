@@ -6,10 +6,12 @@ import PanVerificationCard from "./components/PanVerificationCard";
 import SuccessScreen from "./components/SuccessScreen";
 import Marquee from "react-fast-marquee";
 import Link from "next/link";
+import Loader from "./components/Loader";
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
   const [aadhaarValue, setAadhaarValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     console.log("current step is ", currentStep);
   }, [currentStep]);
@@ -25,17 +27,22 @@ export default function Home() {
 
   return (
     <div className="font-source ">
+      {isLoading && <Loader />}
       <UpperHeader />
       <AdhaarVerificationCard
         setCurrentStep={setCurrentStep}
         currentStep={currentStep}
         aadhaarValue={aadhaarValue}
         setAadhaarValue={setAadhaarValue}
+        setIsLoading={setIsLoading}
+        isLoading={isLoading}
       />
       {currentStep === 2 && (
         <PanVerificationCard
           setCurrentStep={setCurrentStep}
           aadhaarValue={aadhaarValue}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
         />
       )}
       <Marquee pauseOnHover={true} className="my-5">

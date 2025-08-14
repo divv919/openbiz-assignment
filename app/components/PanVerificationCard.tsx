@@ -9,9 +9,13 @@ import InputDate from "./InputDate";
 export default function PanVerificationCard({
   setCurrentStep,
   aadhaarValue,
+  isLoading,
+  setIsLoading,
 }: {
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
   aadhaarValue: string;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isChecked, setIsChecked] = useState(false);
   const [agreementError, setAgreementError] = useState("");
@@ -28,7 +32,6 @@ export default function PanVerificationCard({
   const nameRef = useRef<HTMLInputElement | null>(null);
   const dobRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLSelectElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<{
     visible: boolean;
     status: "error" | "success";
