@@ -1,21 +1,15 @@
-import { PrismaClient } from "../generated/prisma";
+import { prisma } from "./prisma";
 
-export const prisma = new PrismaClient();
 export const checkUser = async (aadhaar: string) => {
-  const res = await prisma.user.findFirst({
-    where: {
-      aadhaar,
-    },
-  });
-  return res;
+  return prisma.user.findFirst({ where: { aadhaar } });
 };
 
 export const postUserStep1 = async (aadhaar: string, aadhaarName: string) => {
-  const res = await prisma.user.create({
+  return prisma.user.create({
     data: { aadhaar, aadhaarName, currentStep: 2 },
   });
-  return res;
 };
+
 export const postUserStep2 = async (
   aadhaar: string,
   panName: string,
@@ -23,7 +17,7 @@ export const postUserStep2 = async (
   type: number,
   dob: Date
 ) => {
-  const res = await prisma.user.update({
+  return prisma.user.update({
     where: { aadhaar },
     data: {
       panName,
@@ -33,5 +27,4 @@ export const postUserStep2 = async (
       currentStep: 3,
     },
   });
-  return res;
 };

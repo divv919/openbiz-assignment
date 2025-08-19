@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     console.log("Working after parsing");
     const user = await checkUser(parsed.aadhaar);
     if (user && user.currentStep > 1) {
-      NextResponse.json({
+      return NextResponse.json({
         success: true,
         user,
         message:
